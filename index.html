@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Endowment Planner">
+  <meta name="theme-color" content="#4a7a66">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Endowment Withdrawal Planner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f2f2f7; color: #1c1c1e; min-height: 100vh; }
+    .app { max-width: 430px; margin: 0 auto; padding: 0 0 80px; }
+
+    /* Header */
+    .header { background: #fff; padding: 16px 16px 12px; border-bottom: 0.5px solid #d1d1d6; text-align: center; position: sticky; top: 0; z-index: 10; }
+    .header h1 { font-size: 17px; font-weight: 600; color: #1c1c1e; }
+    .header p { font-size: 12px; color: #8e8e93; margin-top: 2px; }
+
+    /* Tab bar */
+    .tab-bar { display: flex; background: #fff; border-bottom: 0.5px solid #d1d1d6; }
+    .tab-btn { flex: 1; padding: 10px 4px 8px; font-size: 11px; font-weight: 400; color: #8e8e93; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab-btn.active { color: #4a7a66; font-weight: 600; border-bottom-color: #4a7a66; }
+
+    /* Sections */
+    .section { display: none; padding: 16px; }
+    .section.active { display: block; }
+
+    /* Cards */
+    .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .card-title { font-size: 11px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+    /* Fields */
+    .field { margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 13px; color: #3a3a3c; margin-bottom: 5px; font-weight: 500; }
+    .field input { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid #d1d1d6; border-radius: 10px; background: #fff; color: #1c1c1e; -webkit-appearance: none; }
+    .field input:focus { outline: none; border-color: #4a7a66; box-shadow: 0 0 0 3px rgba(74,122,102,0.15); }
+    .field .hint { font-size: 12px; color: #8e8e93; margin-top: 5px; line-height: 1.4; }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+    .btn { flex: 1; padding: 13px 8px; font-size: 16px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; -webkit-appearance: none; }
+    .btn:active { opacity: 0.8; transform: scale(0.98); }
+    .btn-secondary { background: #e5e5ea; color: #1c1c1e; }
+    .btn-primary { background: #4a7a66; color: #fff; }
+    .btn-full { width: 100%; padding: 13px; font-size: 16px; font-weight: 600; border-radius: 12px; border: none; background: #4a7a66; color: #fff; cursor: pointer; margin-top: 4px; }
+    .btn-full:active { opacity: 0.8; }
+    .btn-danger { background: none; border: none; color: #ff3b30; font-size: 14px; cursor: pointer; padding: 8px 0; }
+
+    /* Note below buttons */
+    .btn-note { font-size: 12px; color: #8e8e93; line-height: 1.5; margin-top: 8px; }
+
+    /* Zone badge */
+    .zone-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+    .zone-green { background: #d4edda; color: #155724; }
+    .zone-yellow { background: #fff3cd; color: #856404; }
+    .zone-red { background: #f8d7da; color: #721c24; }
+
+    /* Result rows */
+    .result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; border-bottom: 0.5px solid #f2f2f7; }
+    .result-row:last-child { border-bottom: none; }
+    .result-label { font-size: 14px; color: #8e8e93; }
+    .result-value { font-size: 16px; font-weight: 600; color: #1c1c1e; }
+    .result-value.big { font-size: 26px; color: #2d5c48; }
+    .result-value.stop { font-size: 18px; color: #721c24; }
+
+    /* Breakdown box */
+    .breakdown { background: #f2f2f7; border-radius: 10px; padding: 12px 14px; margin: 12px 0 4px; }
+    .breakdown-title { font-size: 11px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 0.5px solid #d1d1d6; }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-label { color: #8e8e93; flex: 1; padding-right: 8px; }
+    .breakdown-value { font-weight: 600; color: #1c1c1e; white-space: nowrap; }
+    .breakdown-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; padding-top: 9px; margin-top: 2px; border-top: 1px solid #d1d1d6; color: #2d5c48; }
+
+    /* Alert boxes */
+    .alert { border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
+    .alert-red { background: #f8d7da; }
+    .alert-red-title { font-size: 14px; font-weight: 600; color: #721c24; margin-bottom: 4px; }
+    .alert-red-body { font-size: 13px; color: #721c24; line-height: 1.5; }
+    .alert-green { background: #d4edda; font-size: 13px; color: #155724; line-height: 1.5; }
+    .alert-blue { background: #cce5ff; font-size: 13px; color: #004085; line-height: 1.5; margin-top: 8px; }
+
+    /* Stats grid */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .stat-label { font-size: 11px; color: #8e8e93; font-weight: 500; margin-bottom: 4px; }
+    .stat-value { font-size: 16px; font-weight: 600; color: #1c1c1e; }
+
+    /* History items */
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 0.5px solid #f2f2f7; }
+    .history-item:last-child { border-bottom: none; }
+    .history-year { font-size: 15px; font-weight: 600; color: #1c1c1e; }
+    .history-meta { font-size: 12px; margin-top: 2px; }
+    .history-amount { font-size: 16px; font-weight: 600; color: #2d5c48; }
+    .history-amount.zero { color: #721c24; }
+    .empty { text-align: center; padding: 28px 0; color: #8e8e93; font-size: 15px; }
+
+    /* Help styles */
+    .help-section { margin-bottom: 18px; }
+    .help-section h3 { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 8px; }
+    .help-section p { font-size: 14px; color: #3a3a3c; line-height: 1.6; margin-bottom: 6px; }
+    .help-step { display: flex; gap: 12px; margin-bottom: 12px; }
+    .step-num { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; background: #4a7a66; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+    .step-text { font-size: 14px; color: #3a3a3c; line-height: 1.5; padding-top: 3px; }
+    .zone-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .zone-dot { width: 14px; height: 14px; min-width: 14px; border-radius: 50%; margin-top: 3px; }
+    .dot-green { background: #2d6b4f; }
+    .dot-yellow { background: #b38600; }
+    .dot-red { background: #8b2020; }
+    .zone-text { font-size: 14px; color: #3a3a3c; line-height: 1.5; }
+    .formula-box { background: #f2f2f7; border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #1c1c1e; line-height: 1.8; margin: 8px 0; }
+    .save-msg { font-size: 14px; color: #2d6b4f; margin-top: 10px; min-height: 20px; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>Endowment Withdrawal Planner</h1>
+    <p>Yale smoothing · Guard rail zones</p>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('settings')">Settings</button>
+    <button class="tab-btn" onclick="showTab('calculate')">Calculate</button>
+    <button class="tab-btn" onclick="showTab('history')">History</button>
+    <button class="tab-btn" onclick="showTab('help')">Help</button>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="section active">
+    <div class="card">
+      <div class="card-title">Portfolio</div>
+      <div class="field">
+        <label>Current portfolio value ($)</label>
+        <input type="number" id="s-portfolio" value="1000000" inputmode="numeric">
+        <div class="hint">Your total invested balance today.</div>
+      </div>
+      <div class="field">
+        <label>Withdrawal rate (%)</label>
+        <input type="number" id="s-rate" value="4" step="0.1" inputmode="decimal">
+        <div class="hint">Default is 4%. Change this to match your own plan — typically 3–5%.</div>
+      </div>
+      <div class="field">
+        <label>Expected inflation (%)</label>
+        <input type="number" id="s-inflation" value="2.5" step="0.1" inputmode="decimal">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Prior year withdrawal</div>
+      <div class="field">
+        <label>Last year's actual withdrawal ($)</label>
+        <input type="number" id="s-prior" placeholder="Leave blank for first year" inputmode="numeric">
+        <div class="hint">Auto-saved each time you tap Record. Only fill in manually for your very first year, or to correct an entry.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Guard rail thresholds</div>
+      <div class="field">
+        <label>Yellow zone — freeze withdrawals (%)</label>
+        <input type="number" id="s-yellow" value="20" step="1" inputmode="numeric">
+        <div class="hint">Portfolio dropped this % from HWM — freeze at inflation-adjusted prior year amount.</div>
+      </div>
+      <div class="field">
+        <label>Red zone — stop withdrawals (%)</label>
+        <input type="number" id="s-red" value="30" step="1" inputmode="numeric">
+        <div class="hint">Portfolio dropped this % from HWM — stop all withdrawals and use emergency funds.</div>
+      </div>
+    </div>
+    <button class="btn-full" onclick="saveSettings()">Save settings</button>
+    <p class="save-msg" id="save-msg"></p>
+  </div>
+
+  <!-- CALCULATE -->
+  <div id="tab-calculate" class="section">
+    <div class="card">
+      <div class="card-title">This year's calculation</div>
+      <div class="field">
+        <label>Year</label>
+        <input type="number" id="c-year" value="2027" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>Current portfolio value ($)</label>
+        <input type="number" id="c-portfolio" placeholder="Enter current balance" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>High water mark ($)</label>
+        <input type="number" id="c-hwm" placeholder="Highest balance ever recorded" inputmode="numeric">
+        <div class="hint">The highest portfolio value you have ever recorded. Update this if your portfolio has reached a new all-time high.</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="calculate()">Calculate</button>
+      <button class="btn btn-primary" onclick="recordWithdrawal()">Record</button>
+    </div>
+    <p class="btn-note">Tap <strong>Calculate</strong> to preview. Tap <strong>Record</strong> to save to history, carry the withdrawal forward, and lock in the high water mark.</p>
+
+    <div id="result-area" style="display:none; margin-top:14px;">
+      <div class="card">
+        <div id="zone-badge" class="zone-badge zone-green">Green zone</div>
+        <div id="normal-results">
+          <div class="result-row"><span class="result-label">Recommended withdrawal</span><span class="result-value big" id="r-amount">—</span></div>
+          <div class="result-row"><span class="result-label">Quarterly</span><span class="result-value" id="r-quarterly">—</span></div>
+          <div class="result-row"><span class="result-label">Monthly</span><span class="result-value" id="r-monthly">—</span></div>
+          <div class="result-row"><span class="result-label">Portfolio drop from HWM</span><span class="result-value" id="r-drop">—</span></div>
+          <div class="breakdown" id="yale-breakdown">
+            <div class="breakdown-title">Yale formula breakdown</div>
+            <div class="breakdown-row"><span class="breakdown-label" id="b-label-70">70% side</span><span class="breakdown-value" id="b-val-70">—</span></div>
+            <div class="breakdown-row"><span class="breakdown-label" id="b-label-30">30% side</span><span class="breakdown-value" id="b-val-30">—</span></div>
+            <div class="breakdown-total"><span id="b-total-label">Yale total</span><span id="b-total-val">—</span></div>
+          </div>
+          <p style="font-size:12px;color:#8e8e93;margin-top:6px;" id="zone-note"></p>
+        </div>
+        <div id="red-results" style="display:none;">
+          <div class="result-row"><span class="result-label">Portfolio withdrawal</span><span class="result-value stop">$0 — stopped</span></div>
+          <div class="result-row"><span class="result-label">Portfolio drop from HWM</span><span class="result-value" id="r-drop-red">—</span></div>
+        </div>
+      </div>
+      <div id="red-alert-box" class="alert alert-red" style="display:none;">
+        <div class="alert-red-title">Use emergency funds this year</div>
+        <div class="alert-red-body">Your portfolio has dropped more than <span id="r-red-pct">30</span>% from its high water mark. Do not withdraw from the portfolio. Cover living expenses from your emergency fund and let the portfolio recover undisturbed.</div>
+      </div>
+      <div id="record-confirm" class="alert alert-green" style="display:none;"></div>
+      <div id="hwm-notice" class="alert alert-blue" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="tab-history" class="section">
+    <div id="history-stats" class="stat-grid"></div>
+    <div class="card">
+      <div class="card-title">Withdrawal history</div>
+      <div id="history-list"><p class="empty">No withdrawals recorded yet.</p></div>
+    </div>
+    <button class="btn-danger" onclick="clearHistory()">Clear all history</button>
+  </div>
+
+  <!-- HELP -->
+  <div id="tab-help" class="section">
+    <div class="card">
+      <div class="card-title">How to use this app</div>
+      <div class="help-section">
+        <h3>Getting started</h3>
+        <div class="help-step"><div class="step-num">1</div><div class="step-text">Go to <strong>Settings</strong> and enter your portfolio value and withdrawal rate. The default is 4% — change it to match your own retirement plan. Tap <strong>Save settings</strong>.</div></div>
+        <div class="help-step"><div class="step-num">2</div><div class="step-text">Leave <em>Prior year withdrawal</em> blank for your very first year — the app seeds it automatically as portfolio × your rate.</div></div>
+        <div class="help-step"><div class="step-num">3</div><div class="step-text">Go to <strong>Calculate</strong>. Enter this year's portfolio value and high water mark. Tap <strong>Calculate</strong> to see the full breakdown.</div></div>
+        <div class="help-step"><div class="step-num">4</div><div class="step-text">Tap <strong>Record</strong> to lock in the number. This saves the withdrawal to History, carries it forward as next year's prior year automatically, and locks in the high water mark for the year. If your portfolio has reached a new all-time high, make sure the HWM field reflects that before you tap Record.</div></div>
+        <div class="help-step"><div class="step-num">5</div><div class="step-text">Each new year, go to Calculate, update the portfolio value and high water mark, and repeat.</div></div>
+      </div>
+      <div class="help-section">
+        <h3>The Yale smoothing formula</h3>
+        <p>Your withdrawal blends two numbers to keep income steady through market swings:</p>
+        <div class="formula-box">
+          70% × (last year's withdrawal × inflation factor)<br>
+          + 30% × (withdrawal rate × current portfolio)<br>
+          = recommended withdrawal
+        </div>
+        <p>The 70% side anchors income to last year so it stays stable. The 30% side adjusts with the market. The Calculate screen shows both sides so you can see exactly how the number was reached.</p>
+      </div>
+      <div class="help-section">
+        <h3>Guard rail zones</h3>
+        <div class="zone-row"><div class="zone-dot dot-green"></div><div class="zone-text"><strong>Green zone</strong> — portfolio within 20% of high water mark. Take the full Yale smoothed amount.</div></div>
+        <div class="zone-row"><div class="zone-dot dot-yellow"></div><div class="zone-text"><strong>Yellow zone</strong> — portfolio dropped 20–30% from high water mark. Freeze at last year's amount × inflation only. No increase this year.</div></div>
+        <div class="zone-row"><div class="zone-dot dot-red"></div><div class="zone-text"><strong>Red zone</strong> — portfolio dropped more than 30% from high water mark. Stop all portfolio withdrawals. Use emergency funds and let the portfolio recover.</div></div>
+      </div>
+      <div class="help-section">
+        <h3>High water mark</h3>
+        <p>The highest portfolio value you have ever recorded. Update it whenever your portfolio reaches a new all-time high before tapping Record. The guard rail zones measure how far the portfolio has dropped from this peak — so keeping it accurate matters.</p>
+      </div>
+      <div class="help-section">
+        <h3>Emergency fund</h3>
+        <p>The red zone assumes you have a separate emergency fund — typically 1–2 years of living expenses in cash or short-term bonds — that covers expenses during severe downturns without touching the investment portfolio.</p>
+      </div>
+      <div class="help-section">
+        <h3>Installing on iPhone</h3>
+        <p>Open this page in Safari. Tap the Share button (the box with an arrow at the bottom of the screen), then tap <strong>Add to Home Screen</strong>. The app will appear on your home screen and open full-screen like a native app.</p>
+      </div>
+      <div class="help-section">
+        <h3>Data storage</h3>
+        <p>All settings, prior year withdrawal, and history are saved automatically on this device. Nothing is sent anywhere. Your data will be there the next time you open the app.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+
+  var state = {
+    settings: { portfolio: 1000000, rate: 4.0, inflation: 2.5, prior: null, yellow: 20, red: 30 },
+    history: [],
+    lastResult: null
+  };
+
+  function load() {
+    try { var s = localStorage.getItem('ewp_settings'); if (s) state.settings = JSON.parse(s); } catch(e){}
+    try { var h = localStorage.getItem('ewp_history'); if (h) state.history = JSON.parse(h); } catch(e){}
+    applySettingsToUI();
+    refreshHistory();
+  }
+
+  function applySettingsToUI() {
+    var s = state.settings;
+    document.getElementById('s-portfolio').value = s.portfolio;
+    document.getElementById('s-rate').value = s.rate;
+    document.getElementById('s-inflation').value = s.inflation;
+    document.getElementById('s-yellow').value = s.yellow;
+    document.getElementById('s-red').value = s.red;
+    if (s.prior != null) document.getElementById('s-prior').value = s.prior.toFixed(0);
+  }
+
+  function saveSettings() {
+    var s = state.settings;
+    s.portfolio = parseFloat(document.getElementById('s-portfolio').value) || 1000000;
+    s.rate = parseFloat(document.getElementById('s-rate').value) || 4.0;
+    s.inflation = parseFloat(document.getElementById('s-inflation').value) || 2.5;
+    s.yellow = parseFloat(document.getElementById('s-yellow').value) || 20;
+    s.red = parseFloat(document.getElementById('s-red').value) || 30;
+    var p = parseFloat(document.getElementById('s-prior').value);
+    s.prior = isNaN(p) ? null : p;
+    try { localStorage.setItem('ewp_settings', JSON.stringify(s)); } catch(e){}
+    var msg = document.getElementById('save-msg');
+    msg.textContent = 'Settings saved.';
+    setTimeout(function(){ msg.textContent = ''; }, 2500);
+  }
+
+  function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
+  function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+  function calculate() {
+    var s = state.settings;
+    var portfolio = parseFloat(document.getElementById('c-portfolio').value);
+    var hwm = parseFloat(document.getElementById('c-hwm').value);
+    if (isNaN(portfolio) || portfolio <= 0) { alert('Please enter a current portfolio value.'); return; }
+    if (isNaN(hwm) || hwm <= 0) { alert('Please enter a high water mark value.'); return; }
+
+    var rate = s.rate;
+    var inflation = s.inflation;
+    var prior = (s.prior != null) ? s.prior : (s.portfolio * rate / 100);
+    var drop = Math.max(0, (hwm - portfolio) / hwm * 100);
+    var zone = drop >= s.red ? 'red' : drop >= s.yellow ? 'yellow' : 'green';
+    var side70 = 0.7 * prior * (1 + inflation / 100);
+    var side30 = 0.3 * (rate / 100) * portfolio;
+    var yale = side70 + side30;
+    var finalAmt, zoneNote = '';
+
+    if (zone === 'green') { finalAmt = yale; }
+    else if (zone === 'yellow') { finalAmt = prior * (1 + inflation / 100); zoneNote = 'Yellow zone: withdrawal frozen at inflation-adjusted prior year amount.'; }
+    else { finalAmt = 0; }
+
+    state.lastResult = { year: parseInt(document.getElementById('c-year').value), portfolio: portfolio, hwm: hwm, zone: zone, amount: finalAmt, yale: yale, side70: side70, side30: side30, prior: prior, drop: drop, rate: rate, inflation: inflation };
+
+    var badge = document.getElementById('zone-badge');
+    badge.className = 'zone-badge';
+    var nr = document.getElementById('normal-results');
+    var rr = document.getElementById('red-results');
+    var ra = document.getElementById('red-alert-box');
+
+    if (zone === 'red') {
+      badge.classList.add('zone-red'); badge.textContent = 'Red zone — stop withdrawals';
+      nr.style.display = 'none'; rr.style.display = 'block'; ra.style.display = 'block';
+      document.getElementById('r-drop-red').textContent = fmtPct(drop);
+      document.getElementById('r-red-pct').textContent = s.red;
+    } else {
+      rr.style.display = 'none'; ra.style.display = 'none'; nr.style.display = 'block';
+      if (zone === 'green') { badge.classList.add('zone-green'); badge.textContent = 'Green zone — normal'; }
+      else { badge.classList.add('zone-yellow'); badge.textContent = 'Yellow zone — frozen'; }
+      document.getElementById('r-amount').textContent = fmt(finalAmt);
+      document.getElementById('r-quarterly').textContent = fmt(finalAmt / 4);
+      document.getElementById('r-monthly').textContent = fmt(finalAmt / 12);
+      document.getElementById('r-drop').textContent = fmtPct(drop);
+      document.getElementById('b-label-70').textContent = '70% × (' + fmt(prior) + ' × ' + (1 + inflation/100).toFixed(3) + ')';
+      document.getElementById('b-val-70').textContent = fmt(side70);
+      document.getElementById('b-label-30').textContent = '30% × (' + rate + '% × ' + fmt(portfolio) + ')';
+      document.getElementById('b-val-30').textContent = fmt(side30);
+      if (zone === 'yellow') {
+        document.getElementById('b-total-label').textContent = 'Yale total (not used — frozen)';
+        document.getElementById('yale-breakdown').style.opacity = '0.6';
+      } else {
+        document.getElementById('b-total-label').textContent = 'Yale total = withdrawal';
+        document.getElementById('yale-breakdown').style.opacity = '1';
+      }
+      document.getElementById('b-total-val').textContent = fmt(yale);
+      document.getElementById('zone-note').textContent = zoneNote;
+    }
+
+    document.getElementById('result-area').style.display = 'block';
+    document.getElementById('record-confirm').style.display = 'none';
+    document.getElementById('hwm-notice').style.display = 'none';
+  }
+
+  function recordWithdrawal() {
+    if (!state.lastResult) { calculate(); return; }
+    var r = state.lastResult;
+    state.history.unshift({ year: r.year, amount: r.amount, zone: r.zone, portfolio: r.portfolio, hwm: r.hwm, drop: r.drop });
+    if (r.zone !== 'red') {
+      state.settings.prior = r.amount;
+      document.getElementById('s-prior').value = r.amount.toFixed(0);
+    }
+    try { localStorage.setItem('ewp_history', JSON.stringify(state.history)); } catch(e){}
+    try { localStorage.setItem('ewp_settings', JSON.stringify(state.settings)); } catch(e){}
+    document.getElementById('c-year').value = r.year + 1;
+    var cb = document.getElementById('record-confirm');
+    cb.style.display = 'block';
+    cb.textContent = 'Recorded for ' + r.year + '. Prior year withdrawal saved automatically.';
+    var hwmNotice = document.getElementById('hwm-notice');
+    if (r.portfolio >= r.hwm) {
+      hwmNotice.style.display = 'block';
+      hwmNotice.textContent = 'Note: your portfolio equals or exceeds the high water mark. Next year enter ' + fmt(r.portfolio) + ' (or higher) as the new HWM.';
+    } else {
+      hwmNotice.style.display = 'none';
+    }
+    refreshHistory();
+  }
+
+  function refreshHistory() {
+    var list = document.getElementById('history-list');
+    var stats = document.getElementById('history-stats');
+    if (state.history.length === 0) {
+      list.innerHTML = '<p class="empty">No withdrawals recorded yet.</p>';
+      stats.innerHTML = ''; return;
+    }
+    var pwYears = state.history.filter(function(h){ return h.zone !== 'red'; });
+    var total = pwYears.reduce(function(a,b){ return a+b.amount; }, 0);
+    stats.innerHTML =
+      '<div class="stat"><div class="stat-label">Years recorded</div><div class="stat-value">' + state.history.length + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Latest</div><div class="stat-value">' + (state.history[0].zone==='red' ? 'Emerg. fund' : fmt(state.history[0].amount)) + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Average annual</div><div class="stat-value">' + (pwYears.length ? fmt(total/pwYears.length) : '—') + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Total withdrawn</div><div class="stat-value">' + fmt(total) + '</div></div>';
+    list.innerHTML = state.history.map(function(h) {
+      var c = h.zone==='green'?'#155724':h.zone==='yellow'?'#856404':'#721c24';
+      var amtText = h.zone==='red' ? 'Emergency fund' : fmt(h.amount);
+      var amtClass = h.zone==='red' ? 'history-amount zero' : 'history-amount';
+      return '<div class="history-item"><div><div class="history-year">' + h.year + '</div><div class="history-meta" style="color:' + c + '">' + h.zone + ' zone · ' + fmtPct(h.drop) + ' below HWM</div></div><div class="' + amtClass + '">' + amtText + '</div></div>';
+    }).join('');
+  }
+
+  function clearHistory() {
+    if (!confirm('Clear all history and reset prior year?')) return;
+    state.history = []; state.settings.prior = null;
+    try { localStorage.setItem('ewp_history', JSON.stringify(state.history)); } catch(e){}
+    try { localStorage.setItem('ewp_settings', JSON.stringify(state.settings)); } catch(e){}
+    document.getElementById('s-prior').value = '';
+    refreshHistory();
+  }
+
+  function showTab(name) {
+    var names = ['settings','calculate','history','help'];
+    document.querySelectorAll('.tab-btn').forEach(function(t,i){ t.classList.toggle('active', names[i]===name); });
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('tab-'+name).classList.add('active');
+  }
+
+  load();
+</script>
+</body>
+</html>
