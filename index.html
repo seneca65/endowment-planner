@@ -192,11 +192,6 @@
         <input type="number" id="c-hwm" placeholder="Highest balance ever recorded" inputmode="numeric">
         <div class="hint">The highest portfolio value you have ever recorded. Update this if your portfolio has reached a new all-time high.</div>
       </div>
-      <div class="field">
-        <label>Portfolio return this year (%)</label>
-        <input type="number" id="c-return" placeholder="e.g. 8.5" step="0.1" inputmode="decimal">
-        <div class="hint">Optional. Enter the percentage your portfolio earned this year to see the dollar gain.</div>
-      </div>
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="calculate()">Calculate</button>
@@ -212,7 +207,6 @@
           <div class="result-row"><span class="result-label">Quarterly</span><span class="result-value" id="r-quarterly">—</span></div>
           <div class="result-row"><span class="result-label">Monthly</span><span class="result-value" id="r-monthly">—</span></div>
           <div class="result-row"><span class="result-label">Portfolio drop from HWM</span><span class="result-value" id="r-drop">—</span></div>
-          <div class="result-row" id="r-return-row" style="display:none;"><span class="result-label">Portfolio gain this year</span><span class="result-value" id="r-return">—</span></div>
           <div class="breakdown" id="yale-breakdown">
             <div class="breakdown-title">Yale formula breakdown</div>
             <div class="breakdown-row"><span class="breakdown-label" id="b-label-70">70% side</span><span class="breakdown-value" id="b-val-70">—</span></div>
@@ -400,24 +394,13 @@
     document.getElementById('record-confirm').style.display = 'none';
     document.getElementById('hwm-notice').style.display = 'none';
 
-    // Portfolio return
-    var returnPct = parseFloat(document.getElementById('c-return').value);
-    var returnRow = document.getElementById('r-return-row');
-    if (!isNaN(returnPct)) {
-      var gainDollars = portfolio * (returnPct / 100);
-      var gainSign = gainDollars >= 0 ? '+' : '';
-      document.getElementById('r-return').textContent = gainSign + fmt(gainDollars) + ' (' + gainSign + returnPct.toFixed(1) + '%)';
-      document.getElementById('r-return').style.color = gainDollars >= 0 ? '#2d5c48' : '#721c24';
-      returnRow.style.display = 'flex';
-    } else {
-      returnRow.style.display = 'none';
-    }
+
   }
 
   function recordWithdrawal() {
     if (!state.lastResult) { calculate(); return; }
     var r = state.lastResult;
-    state.history.unshift({ year: r.year, amount: r.amount, zone: r.zone, portfolio: r.portfolio, hwm: r.hwm, drop: r.drop, returnPct: parseFloat(document.getElementById('c-return').value) || null });
+    state.history.unshift({ year: r.year, amount: r.amount, zone: r.zone, portfolio: r.portfolio, hwm: r.hwm, drop: r.drop });
     if (r.zone !== 'red') {
       state.settings.prior = r.amount;
       document.getElementById('s-prior').value = r.amount.toFixed(0);
@@ -456,8 +439,7 @@
       var c = h.zone==='green'?'#155724':h.zone==='yellow'?'#856404':'#721c24';
       var amtText = h.zone==='red' ? 'Emergency fund' : fmt(h.amount);
       var amtClass = h.zone==='red' ? 'history-amount zero' : 'history-amount';
-      var returnText = (h.returnPct != null) ? ' · ' + (h.returnPct >= 0 ? '+' : '') + h.returnPct.toFixed(1) + '% return' : '';
-      return '<div class="history-item"><div><div class="history-year">' + h.year + '</div><div class="history-meta" style="color:' + c + '">' + h.zone + ' zone · ' + fmtPct(h.drop) + ' below HWM' + returnText + '</div></div><div class="' + amtClass + '">' + amtText + '</div></div>';
+      return '<div class="history-item"><div><div class="history-year">' + h.year + '</div><div class="history-meta" style="color:' + c + '">' + h.zone + ' zone · ' + fmtPct(h.drop) + ' below HWM</div></div><div class="' + amtClass + '">' + amtText + '</div></div>';
     }).join('');
   }
 
