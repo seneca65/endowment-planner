@@ -11,117 +11,187 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Endowment Withdrawal Planner</title>
   <style>
+    /* ── LIGHT MODE (default) ── */
+    :root {
+      --bg: #f2f2f7;
+      --bg-card: #ffffff;
+      --bg-input: #ffffff;
+      --bg-breakdown: #f2f2f7;
+      --bg-btn-sec: #e5e5ea;
+      --border: #d1d1d6;
+      --border-thin: #f2f2f7;
+      --text-primary: #1c1c1e;
+      --text-secondary: #3a3a3c;
+      --text-muted: #8e8e93;
+      --text-btn-sec: #1c1c1e;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --accent: #4a7a66;
+      --accent-dark: #3d6657;
+      --green: #2d6b4f;
+      --green-bg: #d4edda;
+      --green-text: #155724;
+      --yellow-bg: #fff3cd;
+      --yellow-text: #856404;
+      --red-bg: #f8d7da;
+      --red-text: #721c24;
+      --blue-bg: #cce5ff;
+      --blue-text: #004085;
+    }
+    body.dark {
+      --bg: #1c1c1e;
+      --bg-card: #2c2c2e;
+      --bg-input: #3a3a3c;
+      --bg-breakdown: #1c1c1e;
+      --bg-btn-sec: #3a3a3c;
+      --border: #48484a;
+      --border-thin: #2c2c2e;
+      --text-primary: #f2f2f7;
+      --text-secondary: #d1d1d6;
+      --text-muted: #8e8e93;
+      --text-btn-sec: #f2f2f7;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --green-bg: #1a3d29;
+      --green-text: #6fcf97;
+      --yellow-bg: #3d3000;
+      --yellow-text: #f2c94c;
+      --red-bg: #3d1a1a;
+      --red-text: #eb5757;
+      --blue-bg: #1a2d3d;
+      --blue-text: #56ccf2;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f2f2f7; color: #1c1c1e; min-height: 100vh; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; transition: background 0.2s, color 0.2s; }
     .app { max-width: 430px; margin: 0 auto; padding: 0 0 80px; }
 
     /* Header */
-    .header { background: #fff; padding: 16px 16px 12px; border-bottom: 0.5px solid #d1d1d6; text-align: center; position: sticky; top: 0; z-index: 10; }
-    .header h1 { font-size: 17px; font-weight: 600; color: #1c1c1e; }
-    .header p { font-size: 12px; color: #8e8e93; margin-top: 2px; }
+    .header { background: var(--bg-card); padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
+    .header-center { flex: 1; text-align: center; }
+    .header h1 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .dark-toggle { background: none; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 10px; font-size: 14px; cursor: pointer; color: var(--text-primary); flex-shrink: 0; }
 
     /* Tab bar */
-    .tab-bar { display: flex; background: #fff; border-bottom: 0.5px solid #d1d1d6; }
-    .tab-btn { flex: 1; padding: 10px 4px 8px; font-size: 11px; font-weight: 400; color: #8e8e93; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; }
-    .tab-btn.active { color: #4a7a66; font-weight: 600; border-bottom-color: #4a7a66; }
+    .tab-bar { display: flex; background: var(--bg-card); border-bottom: 0.5px solid var(--border); }
+    .tab-btn { flex: 1; padding: 10px 4px 8px; font-size: 11px; font-weight: 400; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab-btn.active { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
 
     /* Sections */
     .section { display: none; padding: 16px; }
     .section.active { display: block; }
 
     /* Cards */
-    .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .card-title { font-size: 11px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .card { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+    .card-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
 
     /* Fields */
     .field { margin-bottom: 12px; }
     .field:last-child { margin-bottom: 0; }
-    .field label { display: block; font-size: 13px; color: #3a3a3c; margin-bottom: 5px; font-weight: 500; }
-    .field input { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid #d1d1d6; border-radius: 10px; background: #fff; color: #1c1c1e; -webkit-appearance: none; }
-    .field input:focus { outline: none; border-color: #4a7a66; box-shadow: 0 0 0 3px rgba(74,122,102,0.15); }
-    .field .hint { font-size: 12px; color: #8e8e93; margin-top: 5px; line-height: 1.4; }
+    .field label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; font-weight: 500; }
+    .field input { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-input); color: var(--text-primary); -webkit-appearance: none; }
+    .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,122,102,0.2); }
+    .field .hint { font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
 
     /* Buttons */
     .btn-row { display: flex; gap: 10px; margin-top: 4px; }
     .btn { flex: 1; padding: 13px 8px; font-size: 16px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; -webkit-appearance: none; }
     .btn:active { opacity: 0.8; transform: scale(0.98); }
-    .btn-secondary { background: #e5e5ea; color: #1c1c1e; }
-    .btn-primary { background: #4a7a66; color: #fff; }
-    .btn-full { width: 100%; padding: 13px; font-size: 16px; font-weight: 600; border-radius: 12px; border: none; background: #4a7a66; color: #fff; cursor: pointer; margin-top: 4px; }
+    .btn-secondary { background: var(--bg-btn-sec); color: var(--text-btn-sec); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-full { width: 100%; padding: 13px; font-size: 16px; font-weight: 600; border-radius: 12px; border: none; background: var(--accent); color: #fff; cursor: pointer; margin-top: 4px; }
     .btn-full:active { opacity: 0.8; }
     .btn-danger { background: none; border: none; color: #ff3b30; font-size: 14px; cursor: pointer; padding: 8px 0; }
-
-    /* Note below buttons */
-    .btn-note { font-size: 12px; color: #8e8e93; line-height: 1.5; margin-top: 8px; }
+    .btn-export { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border-radius: 12px; border: 0.5px solid var(--border); background: var(--bg-btn-sec); color: var(--text-btn-sec); cursor: pointer; margin-top: 8px; }
+    .btn-export:active { opacity: 0.8; }
+    .btn-note { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 8px; }
 
     /* Zone badge */
     .zone-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
-    .zone-green { background: #d4edda; color: #155724; }
-    .zone-yellow { background: #fff3cd; color: #856404; }
-    .zone-red { background: #f8d7da; color: #721c24; }
+    .zone-green { background: var(--green-bg); color: var(--green-text); }
+    .zone-yellow { background: var(--yellow-bg); color: var(--yellow-text); }
+    .zone-red { background: var(--red-bg); color: var(--red-text); }
 
     /* Result rows */
-    .result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; border-bottom: 0.5px solid #f2f2f7; }
+    .result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; border-bottom: 0.5px solid var(--border-thin); }
     .result-row:last-child { border-bottom: none; }
-    .result-label { font-size: 14px; color: #8e8e93; }
-    .result-value { font-size: 16px; font-weight: 600; color: #1c1c1e; }
-    .result-value.big { font-size: 26px; color: #2d5c48; }
-    .result-value.stop { font-size: 18px; color: #721c24; }
+    .result-label { font-size: 14px; color: var(--text-muted); }
+    .result-value { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .result-value.big { font-size: 26px; color: var(--green); }
+    .result-value.stop { font-size: 18px; color: var(--red-text); }
 
     /* Breakdown box */
-    .breakdown { background: #f2f2f7; border-radius: 10px; padding: 12px 14px; margin: 12px 0 4px; }
-    .breakdown-title { font-size: 11px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 0.5px solid #d1d1d6; }
+    .breakdown { background: var(--bg-breakdown); border-radius: 10px; padding: 12px 14px; margin: 12px 0 4px; }
+    .breakdown-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .breakdown-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 0.5px solid var(--border); }
     .breakdown-row:last-child { border-bottom: none; }
-    .breakdown-label { color: #8e8e93; flex: 1; padding-right: 8px; }
-    .breakdown-value { font-weight: 600; color: #1c1c1e; white-space: nowrap; }
-    .breakdown-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; padding-top: 9px; margin-top: 2px; border-top: 1px solid #d1d1d6; color: #2d5c48; }
+    .breakdown-label { color: var(--text-muted); flex: 1; padding-right: 8px; }
+    .breakdown-value { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+    .breakdown-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; padding-top: 9px; margin-top: 2px; border-top: 1px solid var(--border); color: var(--green); }
 
     /* Alert boxes */
     .alert { border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
-    .alert-red { background: #f8d7da; }
-    .alert-red-title { font-size: 14px; font-weight: 600; color: #721c24; margin-bottom: 4px; }
-    .alert-red-body { font-size: 13px; color: #721c24; line-height: 1.5; }
-    .alert-green { background: #d4edda; font-size: 13px; color: #155724; line-height: 1.5; }
-    .alert-blue { background: #cce5ff; font-size: 13px; color: #004085; line-height: 1.5; margin-top: 8px; }
+    .alert-red { background: var(--red-bg); }
+    .alert-red-title { font-size: 14px; font-weight: 600; color: var(--red-text); margin-bottom: 4px; }
+    .alert-red-body { font-size: 13px; color: var(--red-text); line-height: 1.5; }
+    .alert-green { background: var(--green-bg); font-size: 13px; color: var(--green-text); line-height: 1.5; }
+    .alert-blue { background: var(--blue-bg); font-size: 13px; color: var(--blue-text); line-height: 1.5; margin-top: 8px; }
 
     /* Stats grid */
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .stat { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .stat-label { font-size: 11px; color: #8e8e93; font-weight: 500; margin-bottom: 4px; }
-    .stat-value { font-size: 16px; font-weight: 600; color: #1c1c1e; }
+    .stat { background: var(--bg-card); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+    .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+    .stat-value { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 
     /* History items */
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 0.5px solid #f2f2f7; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 0.5px solid var(--border-thin); }
     .history-item:last-child { border-bottom: none; }
-    .history-year { font-size: 15px; font-weight: 600; color: #1c1c1e; }
+    .history-year { font-size: 15px; font-weight: 600; color: var(--text-primary); }
     .history-meta { font-size: 12px; margin-top: 2px; }
-    .history-amount { font-size: 16px; font-weight: 600; color: #2d5c48; }
-    .history-amount.zero { color: #721c24; }
-    .empty { text-align: center; padding: 28px 0; color: #8e8e93; font-size: 15px; }
+    .history-amount { font-size: 16px; font-weight: 600; color: var(--green); }
+    .history-amount.zero { color: var(--red-text); }
+    .empty { text-align: center; padding: 28px 0; color: var(--text-muted); font-size: 15px; }
 
-    /* Help styles */
-    .help-section { margin-bottom: 18px; }
-    .help-section h3 { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 8px; }
-    .help-section p { font-size: 14px; color: #3a3a3c; line-height: 1.6; margin-bottom: 6px; }
-    .help-step { display: flex; gap: 12px; margin-bottom: 12px; }
-    .step-num { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; background: #4a7a66; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
-    .step-text { font-size: 14px; color: #3a3a3c; line-height: 1.5; padding-top: 3px; }
-    .zone-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-    .zone-dot { width: 14px; height: 14px; min-width: 14px; border-radius: 50%; margin-top: 3px; }
+    /* Save message */
+    .save-msg { font-size: 14px; color: var(--green); margin-top: 10px; min-height: 20px; font-weight: 500; }
+
+    /* HWM tracker badge */
+    .hwm-badge { background: var(--bg-breakdown); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .hwm-badge-label { font-size: 12px; color: var(--text-muted); }
+    .hwm-badge-value { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+
+    /* ── EXPANDABLE HELP ── */
+    .faq-item { border-bottom: 0.5px solid var(--border-thin); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { width: 100%; background: none; border: none; text-align: left; padding: 13px 0; font-size: 14px; font-weight: 500; color: var(--text-primary); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .faq-q:active { opacity: 0.7; }
+    .faq-arrow { font-size: 12px; color: var(--text-muted); flex-shrink: 0; transition: transform 0.2s; }
+    .faq-arrow.open { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 0 13px; font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+    .faq-a.open { display: block; }
+    .faq-a p { margin-bottom: 6px; }
+    .faq-a p:last-child { margin-bottom: 0; }
+    .faq-formula { background: var(--bg-breakdown); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.8; margin: 8px 0; font-family: monospace; color: var(--text-primary); }
+    .faq-step { display: flex; gap: 10px; margin-bottom: 8px; }
+    .faq-num { width: 22px; height: 22px; min-width: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+    .faq-step-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; padding-top: 2px; }
+    .zone-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .zone-dot { width: 12px; height: 12px; min-width: 12px; border-radius: 50%; margin-top: 3px; }
     .dot-green { background: #2d6b4f; }
     .dot-yellow { background: #b38600; }
     .dot-red { background: #8b2020; }
-    .zone-text { font-size: 14px; color: #3a3a3c; line-height: 1.5; }
-    .formula-box { background: #f2f2f7; border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #1c1c1e; line-height: 1.8; margin: 8px 0; }
-    .save-msg { font-size: 14px; color: #2d6b4f; margin-top: 10px; min-height: 20px; font-weight: 500; }
+    .zone-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
   </style>
 </head>
 <body>
 <div class="app">
+
   <div class="header">
-    <h1>Endowment Withdrawal Planner</h1>
-    <p>Yale smoothing · Guard rail zones</p>
+    <div style="width:60px;"></div>
+    <div class="header-center">
+      <h1>Endowment Withdrawal Planner</h1>
+      <p>Yale smoothing · Guard rail zones</p>
+    </div>
+    <button class="dark-toggle" onclick="toggleDark()" id="dark-btn" aria-label="Toggle dark mode">☀️</button>
   </div>
 
   <div class="tab-bar">
@@ -151,6 +221,14 @@
       </div>
     </div>
     <div class="card">
+      <div class="card-title">High water mark</div>
+      <div class="field">
+        <label>All-time high portfolio value ($)</label>
+        <input type="number" id="s-hwm" placeholder="Enter highest balance ever recorded" inputmode="numeric">
+        <div class="hint">The highest portfolio value you have ever recorded. Saved here and carried forward automatically — update it whenever you reach a new all-time high.</div>
+      </div>
+    </div>
+    <div class="card">
       <div class="card-title">Prior year withdrawal</div>
       <div class="field">
         <label>Last year's actual withdrawal ($)</label>
@@ -177,6 +255,12 @@
 
   <!-- CALCULATE -->
   <div id="tab-calculate" class="section">
+
+    <div id="hwm-banner" class="hwm-badge" style="display:none;">
+      <span class="hwm-badge-label">High water mark</span>
+      <span class="hwm-badge-value" id="hwm-banner-val">—</span>
+    </div>
+
     <div class="card">
       <div class="card-title">This year's calculation</div>
       <div class="field">
@@ -187,17 +271,12 @@
         <label>Current portfolio value ($)</label>
         <input type="number" id="c-portfolio" placeholder="Enter current balance" inputmode="numeric">
       </div>
-      <div class="field">
-        <label>High water mark ($)</label>
-        <input type="number" id="c-hwm" placeholder="Highest balance ever recorded" inputmode="numeric">
-        <div class="hint">The highest portfolio value you have ever recorded. Update this if your portfolio has reached a new all-time high.</div>
-      </div>
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="calculate()">Calculate</button>
       <button class="btn btn-primary" onclick="recordWithdrawal()">Record</button>
     </div>
-    <p class="btn-note">Tap <strong>Calculate</strong> to preview. Tap <strong>Record</strong> to save to history, carry the withdrawal forward, and lock in the high water mark.</p>
+    <p class="btn-note">Tap <strong>Calculate</strong> to preview. Tap <strong>Record</strong> to save to history and carry the withdrawal forward. If your portfolio has reached a new all-time high, update the high water mark in Settings first.</p>
 
     <div id="result-area" style="display:none; margin-top:14px;">
       <div class="card">
@@ -213,7 +292,7 @@
             <div class="breakdown-row"><span class="breakdown-label" id="b-label-30">30% side</span><span class="breakdown-value" id="b-val-30">—</span></div>
             <div class="breakdown-total"><span id="b-total-label">Yale total</span><span id="b-total-val">—</span></div>
           </div>
-          <p style="font-size:12px;color:#8e8e93;margin-top:6px;" id="zone-note"></p>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="zone-note"></p>
         </div>
         <div id="red-results" style="display:none;">
           <div class="result-row"><span class="result-label">Portfolio withdrawal</span><span class="result-value stop">$0 — stopped</span></div>
@@ -236,73 +315,151 @@
       <div class="card-title">Withdrawal history</div>
       <div id="history-list"><p class="empty">No withdrawals recorded yet.</p></div>
     </div>
+    <button class="btn-export" onclick="exportCSV()">⬇ Export history to CSV</button>
     <button class="btn-danger" onclick="clearHistory()">Clear all history</button>
   </div>
 
   <!-- HELP -->
   <div id="tab-help" class="section">
     <div class="card">
-      <div class="card-title">How to use this app</div>
-      <div class="help-section">
-        <h3>Getting started</h3>
-        <div class="help-step"><div class="step-num">1</div><div class="step-text">Go to <strong>Settings</strong> and enter your portfolio value and withdrawal rate. The default is 4% — change it to match your own retirement plan. Tap <strong>Save settings</strong>.</div></div>
-        <div class="help-step"><div class="step-num">2</div><div class="step-text">Leave <em>Prior year withdrawal</em> blank for your very first year — the app seeds it automatically as portfolio × your rate.</div></div>
-        <div class="help-step"><div class="step-num">3</div><div class="step-text">Go to <strong>Calculate</strong>. Enter this year's portfolio value and high water mark. Tap <strong>Calculate</strong> to see the full breakdown.</div></div>
-        <div class="help-step"><div class="step-num">4</div><div class="step-text">Tap <strong>Record</strong> to lock in the number. This saves the withdrawal to History, carries it forward as next year's prior year automatically, and locks in the high water mark for the year. If your portfolio has reached a new all-time high, make sure the HWM field reflects that before you tap Record.</div></div>
-        <div class="help-step"><div class="step-num">5</div><div class="step-text">Each new year, go to Calculate, update the portfolio value and high water mark, and repeat.</div></div>
-      </div>
-      <div class="help-section">
-        <h3>The Yale smoothing formula</h3>
-        <p>Your withdrawal blends two numbers to keep income steady through market swings:</p>
-        <div class="formula-box">
-          70% × (last year's withdrawal × inflation factor)<br>
-          + 30% × (withdrawal rate × current portfolio)<br>
-          = recommended withdrawal
+      <div class="card-title">Frequently asked questions</div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I get started?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <div class="faq-step"><div class="faq-num">1</div><div class="faq-step-text">Go to <strong>Settings</strong> and enter your portfolio value, withdrawal rate (default 4%), inflation, and your all-time high water mark. Tap <strong>Save settings</strong>.</div></div>
+          <div class="faq-step"><div class="faq-num">2</div><div class="faq-step-text">Leave <em>Prior year withdrawal</em> blank for your very first year — the app seeds it automatically as portfolio × your rate.</div></div>
+          <div class="faq-step"><div class="faq-num">3</div><div class="faq-step-text">Go to <strong>Calculate</strong>. Enter this year's portfolio value and tap <strong>Calculate</strong> to see the full breakdown.</div></div>
+          <div class="faq-step"><div class="faq-num">4</div><div class="faq-step-text">Tap <strong>Record</strong> to lock in the number. This saves the withdrawal to History and automatically carries it forward as next year's prior year.</div></div>
+          <div class="faq-step"><div class="faq-num">5</div><div class="faq-step-text">Each new year, update the portfolio value in Calculate and repeat. If you reach a new portfolio high, update the high water mark in Settings first.</div></div>
         </div>
-        <p>The 70% side anchors income to last year so it stays stable. The 30% side adjusts with the market. The Calculate screen shows both sides so you can see exactly how the number was reached.</p>
       </div>
-      <div class="help-section">
-        <h3>Guard rail zones</h3>
-        <div class="zone-row"><div class="zone-dot dot-green"></div><div class="zone-text"><strong>Green zone</strong> — portfolio within 20% of high water mark. Take the full Yale smoothed amount.</div></div>
-        <div class="zone-row"><div class="zone-dot dot-yellow"></div><div class="zone-text"><strong>Yellow zone</strong> — portfolio dropped 20–30% from high water mark. Freeze at last year's amount × inflation only. No increase this year.</div></div>
-        <div class="zone-row"><div class="zone-dot dot-red"></div><div class="zone-text"><strong>Red zone</strong> — portfolio dropped more than 30% from high water mark. Stop all portfolio withdrawals. Use emergency funds and let the portfolio recover.</div></div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How does the Yale smoothing formula work?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>Instead of withdrawing a fixed percentage each year, the Yale formula blends two numbers to keep your income stable through market swings:</p>
+          <div class="faq-formula">70% × (last year's withdrawal × inflation factor)
++ 30% × (withdrawal rate × current portfolio)
+= recommended withdrawal</div>
+          <p>The <strong>70% side</strong> anchors your income to last year so it stays stable even if the market drops. The <strong>30% side</strong> adjusts with the current portfolio value so withdrawals don't grow out of proportion to your balance over time. The Calculate screen shows both sides so you can see exactly how the number was reached.</p>
+        </div>
       </div>
-      <div class="help-section">
-        <h3>High water mark</h3>
-        <p>The highest portfolio value you have ever recorded. Update it whenever your portfolio reaches a new all-time high before tapping Record. The guard rail zones measure how far the portfolio has dropped from this peak — so keeping it accurate matters.</p>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What are the guard rail zones?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>The guard rails protect your portfolio during market downturns by adjusting your withdrawal based on how far the portfolio has dropped from its high water mark.</p>
+          <div class="zone-row"><div class="zone-dot dot-green"></div><div class="zone-text"><strong>Green zone</strong> — portfolio is within 20% of its high water mark. Take the full Yale smoothed withdrawal as normal.</div></div>
+          <div class="zone-row"><div class="zone-dot dot-yellow"></div><div class="zone-text"><strong>Yellow zone</strong> — portfolio has dropped 20–30% from its high water mark. Freeze withdrawals at last year's amount adjusted for inflation only. No increase this year.</div></div>
+          <div class="zone-row"><div class="zone-dot dot-red"></div><div class="zone-text"><strong>Red zone</strong> — portfolio has dropped more than 30% from its high water mark. Stop all portfolio withdrawals entirely. Use your emergency fund for living expenses and let the portfolio recover undisturbed.</div></div>
+          <p style="margin-top:8px;">The 20% and 30% thresholds are adjustable in Settings to match your personal risk tolerance.</p>
+        </div>
       </div>
-      <div class="help-section">
-        <h3>Emergency fund</h3>
-        <p>The red zone assumes you have a separate emergency fund — typically 1–2 years of living expenses in cash or short-term bonds — that covers expenses during severe downturns without touching the investment portfolio.</p>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What is the high water mark?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>The high water mark (HWM) is the highest portfolio value you have ever recorded. It is your reference point for measuring how far the portfolio has fallen from its peak.</p>
+          <p>You enter the HWM once in Settings and it is saved and carried forward automatically. Update it whenever your portfolio reaches a new all-time high — that new high becomes the new HWM going forward.</p>
+          <p>Keeping the HWM accurate is important because the guard rail zones are calculated as a percentage drop from the HWM. An outdated HWM will give you incorrect zone readings.</p>
+        </div>
       </div>
-      <div class="help-section">
-        <h3>Installing on iPhone</h3>
-        <p>Open this page in Safari. Tap the Share button (the box with an arrow at the bottom of the screen), then tap <strong>Add to Home Screen</strong>. The app will appear on your home screen and open full-screen like a native app.</p>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What is the prior year withdrawal and do I need to update it?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>The prior year withdrawal is the amount you withdrew last year. It is the anchor for the 70% side of the Yale formula — this year's recommendation is partly based on last year's amount adjusted for inflation.</p>
+          <p>You only need to enter it manually once — your very first year. After that, every time you tap <strong>Record</strong>, the app automatically saves the withdrawal amount and uses it as next year's prior year figure. You never have to update it manually again.</p>
+          <p>If you ever need to correct it, you can edit it directly in Settings.</p>
+        </div>
       </div>
-      <div class="help-section">
-        <h3>Data storage</h3>
-        <p>All settings, prior year withdrawal, and history are saved automatically on this device. Nothing is sent anywhere. Your data will be there the next time you open the app.</p>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What is an emergency fund and how much do I need?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>The red zone assumes you have a separate emergency fund — money held outside your investment portfolio in cash, a money market account, or short-term bonds — that you can draw from during a severe market downturn without selling investments at a loss.</p>
+          <p>A typical guideline is to keep <strong>1–2 years of living expenses</strong> in your emergency fund. This gives your portfolio time to recover from a 30%+ drop without forcing you to sell at the bottom.</p>
+          <p>When the portfolio recovers back above the red zone threshold, you resume normal withdrawals from the portfolio and replenish the emergency fund over time.</p>
+        </div>
       </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I export my history?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>Go to the <strong>History</strong> tab and tap <strong>Export history to CSV</strong>. This downloads a spreadsheet file containing all your recorded years — the year, withdrawal amount, zone, portfolio value, and how far below the high water mark you were.</p>
+          <p>You can open the CSV file in Excel, Google Sheets, or Numbers to keep a permanent record outside the app.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Will my data be saved if I close the app?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>Yes — all settings, prior year withdrawal, high water mark, and history are saved automatically on your device using browser storage. Nothing is sent to any server.</p>
+          <p>Your data will still be there the next time you open the app, as long as you are not using a private or incognito browsing mode, and your browser is not set to clear data on close. On iPhone, always open the app from the home screen icon (installed via Safari) for the best experience.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I install this on my iPhone?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>Open this page in <strong>Safari</strong> on your iPhone. Tap the Share button (the box with an arrow at the bottom of the screen), then tap <strong>Add to Home Screen</strong>. Tap Add in the top right corner.</p>
+          <p>The app will appear on your home screen and open full-screen like a native app. It also works offline once installed.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How does this app work with the Monte Carlo simulator?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a">
+          <p>The two apps are designed to work together. Use the <strong>Monte Carlo Retirement Simulator</strong> to run thousands of scenarios and find a withdrawal rate that gives you a survival rate you are comfortable with — typically 90% or higher.</p>
+          <p>Then enter that rate here in Settings as your withdrawal rate. The Endowment Planner then manages your withdrawals year by year using the Yale smoothing formula and guard rails to protect the portfolio in down markets.</p>
+        </div>
+      </div>
+
     </div>
   </div>
+
 </div>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
+  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
   var state = {
-    settings: { portfolio: 1000000, rate: 4.0, inflation: 2.5, prior: null, yellow: 20, red: 30 },
+    settings: { portfolio: 1000000, rate: 4.0, inflation: 2.5, prior: null, hwm: null, yellow: 20, red: 30 },
     history: [],
-    lastResult: null
+    lastResult: null,
+    dark: false
   };
 
+  /* ── DARK MODE ── */
+  function toggleDark() {
+    state.dark = !state.dark;
+    applyDark();
+    try { localStorage.setItem('ewp_dark', state.dark ? '1' : '0'); } catch(e){}
+  }
+  function applyDark() {
+    document.body.classList.toggle('dark', state.dark);
+    document.getElementById('dark-btn').textContent = state.dark ? '☀️' : '🌙';
+  }
+
+  /* ── FAQ EXPAND/COLLAPSE ── */
+  function toggleFaq(btn) {
+    var arrow = btn.querySelector('.faq-arrow');
+    var answer = btn.nextElementSibling;
+    var isOpen = answer.classList.contains('open');
+    answer.classList.toggle('open', !isOpen);
+    arrow.classList.toggle('open', !isOpen);
+  }
+
+  /* ── LOAD ── */
   function load() {
+    try { var d = localStorage.getItem('ewp_dark'); if (d !== null) state.dark = d === '1'; } catch(e){}
     try { var s = localStorage.getItem('ewp_settings'); if (s) state.settings = JSON.parse(s); } catch(e){}
     try { var h = localStorage.getItem('ewp_history'); if (h) state.history = JSON.parse(h); } catch(e){}
+    applyDark();
     applySettingsToUI();
     refreshHistory();
+    refreshHWMBanner();
   }
 
   function applySettingsToUI() {
@@ -313,6 +470,18 @@
     document.getElementById('s-yellow').value = s.yellow;
     document.getElementById('s-red').value = s.red;
     if (s.prior != null) document.getElementById('s-prior').value = s.prior.toFixed(0);
+    if (s.hwm != null) document.getElementById('s-hwm').value = s.hwm.toFixed(0);
+  }
+
+  function refreshHWMBanner() {
+    var banner = document.getElementById('hwm-banner');
+    var val = document.getElementById('hwm-banner-val');
+    if (state.settings.hwm != null) {
+      banner.style.display = 'flex';
+      val.textContent = fmt(state.settings.hwm);
+    } else {
+      banner.style.display = 'none';
+    }
   }
 
   function saveSettings() {
@@ -324,22 +493,26 @@
     s.red = parseFloat(document.getElementById('s-red').value) || 30;
     var p = parseFloat(document.getElementById('s-prior').value);
     s.prior = isNaN(p) ? null : p;
+    var h = parseFloat(document.getElementById('s-hwm').value);
+    s.hwm = isNaN(h) ? null : h;
     try { localStorage.setItem('ewp_settings', JSON.stringify(s)); } catch(e){}
+    refreshHWMBanner();
     var msg = document.getElementById('save-msg');
     msg.textContent = 'Settings saved.';
     setTimeout(function(){ msg.textContent = ''; }, 2500);
   }
 
+  /* ── FORMAT ── */
   function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
   function fmtPct(n) { return n.toFixed(1) + '%'; }
 
+  /* ── CALCULATE ── */
   function calculate() {
     var s = state.settings;
     var portfolio = parseFloat(document.getElementById('c-portfolio').value);
-    var hwm = parseFloat(document.getElementById('c-hwm').value);
     if (isNaN(portfolio) || portfolio <= 0) { alert('Please enter a current portfolio value.'); return; }
-    if (isNaN(hwm) || hwm <= 0) { alert('Please enter a high water mark value.'); return; }
 
+    var hwm = s.hwm != null ? s.hwm : portfolio;
     var rate = s.rate;
     var inflation = s.inflation;
     var prior = (s.prior != null) ? s.prior : (s.portfolio * rate / 100);
@@ -393,10 +566,9 @@
     document.getElementById('result-area').style.display = 'block';
     document.getElementById('record-confirm').style.display = 'none';
     document.getElementById('hwm-notice').style.display = 'none';
-
-
   }
 
+  /* ── RECORD ── */
   function recordWithdrawal() {
     if (!state.lastResult) { calculate(); return; }
     var r = state.lastResult;
@@ -404,6 +576,12 @@
     if (r.zone !== 'red') {
       state.settings.prior = r.amount;
       document.getElementById('s-prior').value = r.amount.toFixed(0);
+    }
+    // Auto-update HWM if portfolio is higher
+    if (r.portfolio > (state.settings.hwm || 0)) {
+      state.settings.hwm = r.portfolio;
+      document.getElementById('s-hwm').value = r.portfolio.toFixed(0);
+      refreshHWMBanner();
     }
     try { localStorage.setItem('ewp_history', JSON.stringify(state.history)); } catch(e){}
     try { localStorage.setItem('ewp_settings', JSON.stringify(state.settings)); } catch(e){}
@@ -414,13 +592,14 @@
     var hwmNotice = document.getElementById('hwm-notice');
     if (r.portfolio >= r.hwm) {
       hwmNotice.style.display = 'block';
-      hwmNotice.textContent = 'Note: your portfolio equals or exceeds the high water mark. Next year enter ' + fmt(r.portfolio) + ' (or higher) as the new HWM.';
+      hwmNotice.textContent = 'New high water mark recorded: ' + fmt(r.portfolio) + '. Settings updated automatically.';
     } else {
       hwmNotice.style.display = 'none';
     }
     refreshHistory();
   }
 
+  /* ── HISTORY ── */
   function refreshHistory() {
     var list = document.getElementById('history-list');
     var stats = document.getElementById('history-stats');
@@ -437,12 +616,37 @@
       '<div class="stat"><div class="stat-label">Total withdrawn</div><div class="stat-value">' + fmt(total) + '</div></div>';
     list.innerHTML = state.history.map(function(h) {
       var c = h.zone==='green'?'#155724':h.zone==='yellow'?'#856404':'#721c24';
+      if (state.dark) c = h.zone==='green'?'#6fcf97':h.zone==='yellow'?'#f2c94c':'#eb5757';
       var amtText = h.zone==='red' ? 'Emergency fund' : fmt(h.amount);
       var amtClass = h.zone==='red' ? 'history-amount zero' : 'history-amount';
       return '<div class="history-item"><div><div class="history-year">' + h.year + '</div><div class="history-meta" style="color:' + c + '">' + h.zone + ' zone · ' + fmtPct(h.drop) + ' below HWM</div></div><div class="' + amtClass + '">' + amtText + '</div></div>';
     }).join('');
   }
 
+  /* ── CSV EXPORT ── */
+  function exportCSV() {
+    if (state.history.length === 0) { alert('No history to export yet.'); return; }
+    var rows = ['Year,Withdrawal,Zone,Portfolio Value,Drop from HWM (%)'];
+    state.history.forEach(function(h) {
+      rows.push([
+        h.year,
+        h.zone === 'red' ? 0 : Math.round(h.amount),
+        h.zone,
+        Math.round(h.portfolio),
+        h.drop.toFixed(1)
+      ].join(','));
+    });
+    var csv = rows.join('\n');
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'endowment-withdrawal-history.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ── CLEAR HISTORY ── */
   function clearHistory() {
     if (!confirm('Clear all history and reset prior year?')) return;
     state.history = []; state.settings.prior = null;
@@ -452,11 +656,13 @@
     refreshHistory();
   }
 
+  /* ── TAB SWITCHING ── */
   function showTab(name) {
     var names = ['settings','calculate','history','help'];
     document.querySelectorAll('.tab-btn').forEach(function(t,i){ t.classList.toggle('active', names[i]===name); });
     document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
     document.getElementById('tab-'+name).classList.add('active');
+    if (name === 'history') refreshHistory();
   }
 
   load();
